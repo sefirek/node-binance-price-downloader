@@ -1,0 +1,15 @@
+{
+  "name": "binance-price-downloader",
+  "version": "1.0.0",
+  "description": "Download full price history from binance",
+  "main": "index.mjs",
+  "scripts": {
+    "test": "node index.mjs BTCUSDT 1M csv"
+  },
+  "keywords": [],
+  "author": "sefirek",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.5.1"
+  }
+}
