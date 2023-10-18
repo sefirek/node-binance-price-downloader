@@ -1,7 +1,6 @@
 import fs from "fs";
 import path from "path";
 import { checkMarket, fetchMarketData, getFirstDate } from "./binance.mjs";
-(async () => console.log(await getFirstDate()))();
 const args = process.argv.slice(2) || [];
 if (args.join(" ").includes("help") || args.length < 3) {
   console.log("Format: node index.mjs [market] [interval] [file format]");
@@ -32,8 +31,8 @@ if (args.length === 3) {
       console.log("Available formats: " + FILE_FORMATS.join(", ") + ".");
       return;
     }
+    console.log("Downloading data");
     const data = await fetchMarketData(symbol, interval);
-    console.log("ok");
     const downloadDirectory = path.join(process.cwd(), "downloads");
     const filePath = path.join(
       downloadDirectory,
@@ -50,17 +49,17 @@ if (args.length === 3) {
       const CSV_HEADER =
         "date,open,high,low,close,volume,kline close,quote asset,number of trades,taker buy base,taker buy quote,unused";
       fs.writeFileSync(filePath, CSV_HEADER + "\n");
-      const csv = data
-        .reduce(
-          (prev, curr, index) => {
-            console.log((((index + 1) / data.length) * 100).toFixed(4) + "%");
-            fs.appendFileSync(filePath, curr.join(",") + "\n");
-            return prev;
-          },
-          [CSV_HEADER]
-        )
-        .join("\n");
-      console.log("Done");
+      const partCount = data.length / 1000;
+      for (let i = 0; i < partCount; i += 1) {
+        const dataPart = data.slice(i * 1000, (i + 1) * 1000);
+        const text =
+          (i > 0 ? "\n" : "") + dataPart.map((row) => row.join(",")).join("\n");
+        fs.appendFileSync(filePath, text);
+        process.stdout.write(
+          "\r" + (((i + 1) / Math.ceil(partCount)) * 100).toFixed(4) + "%"
+        );
+      }
+      console.log("\nDone");
     }
   })();
 }

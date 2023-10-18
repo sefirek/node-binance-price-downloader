@@ -119,13 +119,14 @@ export async function fetchMarketData(market = "BTCUSDT", tickInterval = "1h") {
     try {
       for await (const parallelRequest of parallelRequestTable) {
         try {
-          console.log(((i / PARALLEL_REQUEST_LENGTH) * 100).toFixed(2) + "%");
+          process.stdout.write(
+            "\r" + ((i / PARALLEL_REQUEST_LENGTH) * 100).toFixed(2) + "%"
+          );
           const responses = await Promise.all(
             parallelRequest.map((gen) => gen())
           );
           const response = responses.flat();
           downloadedData.push(response);
-          if (typeof response === "boolean") console.log("boooool");
           i += 1;
           parallelRequestTable.shift();
         } catch (e) {
@@ -134,7 +135,7 @@ export async function fetchMarketData(market = "BTCUSDT", tickInterval = "1h") {
       }
     } catch (e) {}
   } while (parallelRequestTable.length > 0);
-
+  process.stdout.write("\n");
   return downloadedData.flat();
 }
 
