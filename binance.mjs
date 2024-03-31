@@ -1,6 +1,6 @@
 import axios from "axios";
 
-export async function fetchMarketData(market = "BTCUSDT", tickInterval = "1h") {
+export async function fetchMarketData(market = "BTCUSDT", tickInterval = "1h", log = false) {
   let date = new Date();
   const NUMBER_OF_PARALLEL_REQUESTS = 100;
   const startDate = await getFirstDate(market);
@@ -119,7 +119,7 @@ export async function fetchMarketData(market = "BTCUSDT", tickInterval = "1h") {
     try {
       for await (const parallelRequest of parallelRequestTable) {
         try {
-          process.stdout.write(
+          log && process.stdout.write(
             "\r" + ((i / PARALLEL_REQUEST_LENGTH) * 100).toFixed(2) + "%"
           );
           const responses = await Promise.all(
@@ -133,10 +133,10 @@ export async function fetchMarketData(market = "BTCUSDT", tickInterval = "1h") {
           throw e;
         }
       }
-    } catch (e) {}
+    } catch (e) { }
   } while (parallelRequestTable.length > 0);
-  process.stdout.write("\n");
-  return downloadedData.flat();
+  log && process.stdout.write("\n");
+  return downloadedData.flat().sort(([dateA], [dateB]) => dateA - dateB);;
 }
 
 export async function getFirstDate(market = "BTCUSDT") {

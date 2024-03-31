@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import { checkMarket, fetchMarketData, getFirstDate } from "./binance.mjs";
+import { checkMarket, fetchMarketData } from "./binance.mjs";
 const args = process.argv.slice(2) || [];
 if (args.join(" ").includes("help") || args.length < 3) {
   console.log("Format: node index.mjs [market] [interval] [file format]");
@@ -32,7 +32,7 @@ if (args.length === 3) {
       return;
     }
     console.log("Downloading data");
-    const data = await fetchMarketData(symbol, interval);
+    const data = await fetchMarketData(symbol, interval, true);
     const downloadDirectory = path.join(process.cwd(), "downloads");
     const filePath = path.join(
       downloadDirectory,
