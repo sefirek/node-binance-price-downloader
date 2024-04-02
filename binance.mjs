@@ -1,9 +1,9 @@
 import axios from "axios";
 
-export async function fetchMarketData(market = "BTCUSDT", tickInterval = "1h", log = false) {
+export async function fetchMarketData(market = "BTCUSDT", tickInterval = "1h", log = false, firstDate = null) {
   let date = new Date();
   const NUMBER_OF_PARALLEL_REQUESTS = 100;
-  const startDate = await getFirstDate(market);
+  const startDate = firstDate || await getFirstDate(market);
   const times = [];
   do {
     let endTime = date.getTime();
@@ -169,7 +169,7 @@ export async function checkMarket(market = "BTCUSDT", tickInterval = "5m") {
     "&limit=" +
     1;
   try {
-    const response = await axios.get(url);
+    await axios.get(url);
     return true;
   } catch (e) {
     return false;
